@@ -83,16 +83,8 @@ export default function Navbar() {
           </h1>
         </div>
 
-        {/* Hamburger Icon */}
-        <button className="md:hidden z-20" onClick={() => setMenuOpen(!menuOpen)}>
-          <Menu size={24} />
-        </button>
-
-        {/* Center: Nav Links */}
-        <div
-          className={`absolute top-full left-0 w-full md:static md:w-auto md:flex md:items-center bg-[#E1D7B9] md:bg-transparent shadow-md md:shadow-none transition-all duration-300 overflow-hidden ${menuOpen ? "max-h-96 p-4" : "max-h-0 md:max-h-full"}`}
-        >
-          <ul className="flex flex-col md:flex-row gap-4 md:gap-6 items-center font-medium">
+       <div className="flex-1 hidden md:flex justify-center mr-20">
+          <ul className="flex gap-6 items-center font-medium">
             {user?.role === "admin" ? (
               <>
                 <li><Link to="/register-mess">Mess Connect</Link></li>
@@ -111,16 +103,26 @@ export default function Navbar() {
                     <li><Link to="/select-mess">Select mess</Link></li>
                   </>
                 )}
-                <li onClick={() => navigate(`/feedback/${user?.userId}`)} className="cursor-pointer">
-                  Feedback
-                </li>
+                {user && (
+                  <li
+                    onClick={() => navigate(`/feedback/${user?.userId}`)}
+                    className="cursor-pointer"
+                  >
+                    Feedback
+                  </li>
+                )}
               </>
             )}
           </ul>
         </div>
 
         {/* Right: Avatar/Login */}
-        <div className="flex items-center z-10">
+        <div className="flex items-center z-10 gap-2">
+          {/* Hamburger Icon */}
+          <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
+            <Menu size={24} />
+          </button>
+
           {!user ? (
             <Button
               className="rounded-full w-28 bg-transparent text-black border border-black hover:text-white hover:bg-black"
@@ -139,7 +141,7 @@ export default function Navbar() {
                 <div>
                   <div className="flex gap-4 mb-3">
                     <Avatar className="w-14 h-14">
-                      <AvatarImage src={user?.profile?.photoUrl}/>
+                      <AvatarImage src={user?.profile?.photoUrl} />
                     </Avatar>
                     <div>
                       <h4 className="font-medium">{user?.fullname}</h4>
@@ -151,7 +153,10 @@ export default function Navbar() {
                   <div className="flex flex-col text-gray-600">
                     {user?.role === "admin" && (
                       <>
-                        <div className="flex items-center gap-2 cursor-pointer mb-2" onClick={() => navigate(`/settings/${user.userId}`)}>
+                        <div
+                          className="flex items-center gap-2 cursor-pointer mb-2"
+                          onClick={() => navigate(`/settings/${user.userId}`)}
+                        >
                           <Settings className="w-5 h-5" />
                           <Button variant="link">Settings</Button>
                         </div>
@@ -202,6 +207,39 @@ export default function Navbar() {
           )}
         </div>
       </div>
+
+      {menuOpen && (
+        <div className="md:hidden bg-[#E1D7B9] p-4 shadow-md">
+          <ul className="flex flex-col gap-4 items-center font-medium">
+            {user?.role === "admin" ? (
+              <>
+                <li><Link to="/register-mess">Mess Connect</Link></li>
+                <li><Link to="/announcement">Announcement</Link></li>
+                <li><Link to="/confirmations">View Confirmations</Link></li>
+                <li><Link to="/viewFeedback">View Feedbacks</Link></li>
+              </>
+            ) : (
+              <>
+                <li><Link to="/announcement">Announcements</Link></li>
+                <li><Link to="/about-us">About us</Link></li>
+                <li><Link to="/browse">Browse</Link></li>
+                {user && (
+                  <>
+                    <li><Link to="/meal-confirmation">Meals</Link></li>
+                    <li><Link to="/select-mess">Select mess</Link></li>
+                    <li
+                      onClick={() => navigate(`/feedback/${user?.userId}`)}
+                      className="cursor-pointer"
+                    >
+                      Feedback
+                    </li>
+                  </>
+                )}
+              </>
+            )}
+          </ul>
+        </div>
+      )}
     </motion.div>
   );
 }
