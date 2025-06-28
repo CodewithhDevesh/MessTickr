@@ -19,7 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+import Home from "../Home";
 
 export default function Announce() {
   const [announcements, setAnnouncements] = useState([]);
@@ -34,13 +34,12 @@ export default function Announce() {
   const { messes } = useSelector((store) => store.mess);
   const isAdmin = user?.role === "admin";
 
+  if (!user) return <Home />;
   const backgroundImage = isAdmin ? "/MessI1.png" : "/MessI.png";
 
   const adminMesses = messes.filter((mess) => {
     const creatorId =
-      typeof mess.createdBy === "string"
-        ? mess.createdBy
-        : mess.createdBy?._id;
+      typeof mess.createdBy === "string" ? mess.createdBy : mess.createdBy?._id;
     return creatorId === user._id;
   });
 
