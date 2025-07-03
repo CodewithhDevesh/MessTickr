@@ -16,15 +16,10 @@ import messRoute from "./routes/mess.route.js";
 // Load environment variables from .env file
 dotenv.config();
 
-// Initialize Express app
+// Initialize an Express application
 const app = express();
 
-// Middleware to parse incoming data
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
-// CORS configuration for both local and deployed frontend
+//  CORS configuration: support both localhost & Vercel frontend
 const allowedOrigins = [
   "http://localhost:5173",
   "https://mess-tickr.vercel.app",
@@ -41,11 +36,19 @@ const corsOptions = {
   credentials: true,
 };
 
+//  Use CORS first before other middleware
 app.use(cors(corsOptions));
 
-// Test route to verify backend is up
+// Middleware: Parse JSON and form data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Middleware: Parse cookies
+app.use(cookieParser());
+
+//  Root test route
 app.get("/", (req, res) => {
-  res.send("Backend is running!");
+  res.send(" Backend running with CORS and cookies configured");
 });
 
 // API routes
@@ -56,10 +59,10 @@ app.use("/api/v1/announcement", announcementRoute);
 app.use("/api/v1/feedback", feedbackRoute);
 app.use("/api/v1/mess", messRoute);
 
-// Set the port
+// Set the port number for the server
 const PORT = process.env.PORT || 3000;
 
-// Connect to DB and start server
+// Connect to the database and start the server
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
