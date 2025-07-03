@@ -1,61 +1,72 @@
 // Importing required modules using ES6 syntax
-import express from "express"; // Framework for building server-side applications
-import cookieParser from "cookie-parser"; // Middleware to parse cookies
-import cors from "cors"; // Middleware to enable Cross-Origin Resource Sharing
-import dotenv from "dotenv"; // Load environment variables
-import connectDB from "./utils/db.js"; // Database connection function
+import express from "express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import dotenv from "dotenv";
+import connectDB from "./utils/db.js";
 
 // Importing route handlers
-import userRoute from "./routes/user.route.js"; // User-related routes
-import  mealConfirmationRoute  from "./routes/mealConfirmation.route.js"; // Meal confirmation-related routes
-import settingsRoute from "./routes/settings.route.js"; // Settings-related routes
-import announcementRoute from "./routes/announcement.route.js"; // Announcement-related routes
-import feedbackRoute from "./routes/feedback.route.js"; // Feedback-related routes
+import userRoute from "./routes/user.route.js";
+import mealConfirmationRoute from "./routes/mealConfirmation.route.js";
+import settingsRoute from "./routes/settings.route.js";
+import announcementRoute from "./routes/announcement.route.js";
+import feedbackRoute from "./routes/feedback.route.js";
 import messRoute from "./routes/mess.route.js";
 
-//  Load environment variables from .env file
+// Load environment variables from .env file
 dotenv.config();
 
-// Initialize an Express application
+// Initialize Express app
 const app = express();
 
-//  Middleware: Parse JSON data in incoming requests
-app.use(express.json()); 
-
-//  Middleware: Parse URL-encoded data in incoming requests (e.g., from forms)
-app.use(express.urlencoded({ extended: true })); 
-
-//  Middleware: Parse cookies from incoming requests
+// Middleware to parse incoming data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-//  CORS configuration to allow requests from the specified origin
+// CORS configuration for both local and deployed frontend
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://mess-tickr.vercel.app",
+];
+
 const corsOptions = {
-    origin: "http://localhost:5173", // Allow requests from this origin (replace with your frontend URL)
-    credentials: true, // Allow sending cookies with CORS requests
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
 };
 
-//  Middleware: Enable CORS with the specified options
 app.use(cors(corsOptions));
 
-// API routes
-app.use("/api/v1/user", userRoute); // User-related routes
-app.use("/api/v1/mealconfirmation", mealConfirmationRoute); // Meal confirmation-related routes
-app.use("/api/v1/settings", settingsRoute); // Settings-related routes
-app.use("/api/v1/announcement", announcementRoute); // Announcement-related routes
-app.use("/api/v1/feedback", feedbackRoute); // Feedback-related routes
-app.use("/api/v1/mess",messRoute); //Mess-related routes
+// Test route to verify backend is up
+app.get("/", (req, res) => {
+  res.send("Backend is running!");
+});
 
-//  Set the port number for the server
+// API routes
+app.use("/api/v1/user", userRoute);
+app.use("/api/v1/mealconfirmation", mealConfirmationRoute);
+app.use("/api/v1/settings", settingsRoute);
+app.use("/api/v1/announcement", announcementRoute);
+app.use("/api/v1/feedback", feedbackRoute);
+app.use("/api/v1/mess", messRoute);
+
+// Set the port
 const PORT = process.env.PORT || 3000;
 
-// Connect to the database and start the server
+// Connect to DB and start server
 connectDB()
-    .then(() => {
-        app.listen(PORT, () => {
-            console.log(`🚀 Server running at port ${PORT}`);
-        });
-    })
-    .catch((error) => {
-        console.error("❌ Database connection failed:", error);
-        process.exit(1); // Exit process with failure
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running at port ${PORT}`);
     });
+  })
+  .catch((error) => {
+    console.error("❌ Database connection failed:", error);
+    process.exit(1);
+  });
