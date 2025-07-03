@@ -3,7 +3,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
-import serverless from "serverless-http"; 
+import serverless from "serverless-http";
 import connectDB from "./utils/db.js";
 
 // Importing route handlers
@@ -55,8 +55,9 @@ app.use("/api/v1/announcement", announcementRoute);
 app.use("/api/v1/feedback", feedbackRoute);
 app.use("/api/v1/mess", messRoute);
 
-// Only connect and start server locally (not in Vercel)
+// Server or export handler
 if (process.env.NODE_ENV !== "production") {
+  // Running locally
   const PORT = process.env.PORT || 3000;
   connectDB()
     .then(() => {
@@ -69,8 +70,10 @@ if (process.env.NODE_ENV !== "production") {
       process.exit(1);
     });
 } else {
-  // For Vercel: ensure DB is connected before handling
-  await connectDB();
+  // For Vercel serverless: connect once
+  connectDB().catch((err) => {
+    console.error("❌ DB connection failed in Vercel:", err);
+  });
 }
 
 // Export handler for Vercel
