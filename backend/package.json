@@ -19,6 +19,7 @@
     "mongoose": "^8.13.2",
     "multer": "^2.0.1",
     "nodemailer": "^6.10.0",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "serverless-http": "^3.2.0"
   }
 }
