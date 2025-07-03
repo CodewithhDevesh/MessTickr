@@ -31,7 +31,8 @@ export default function UpdateConfirmation() {
   const todayDate = new Date().toISOString().split("T")[0];
 
   const toggleMeal = (meal) => {
-    const isBeforeCutoff = countdowns[meal] && countdowns[meal] !== "Cutoff Passed";
+    const isBeforeCutoff =
+      countdowns[meal] && countdowns[meal] !== "Cutoff Passed";
     if (!exists || !isBeforeCutoff) return;
     setInput((prev) => ({ ...prev, [meal]: !prev[meal] }));
   };
@@ -74,9 +75,16 @@ export default function UpdateConfirmation() {
           `${SETTINGS_API_END_POINT}/cutoff/${selectedMess.messId}`,
           { withCredentials: true }
         );
-        setCutoffTime(res.data?.cutoffTime || {});
+
+        if (res.data?.cutoffTime) {
+          console.log("⏱️ Cutoff Time:", res.data.cutoffTime); // debug
+          setCutoffTime(res.data.cutoffTime);
+        } else {
+          toast.error("Cutoff times not configured.");
+        }
       } catch (error) {
-        console.error("Error fetching cutoff times", error);
+        console.error("Error fetching cutoff times:", error);
+        toast.error("Failed to fetch cutoff times.");
       }
     };
 
@@ -87,7 +95,9 @@ export default function UpdateConfirmation() {
     const interval = setInterval(() => {
       const newCountdowns = {};
       for (const meal in cutoffTime) {
-        const [hours, minutes] = cutoffTime[meal]?.split(":") || [];
+        if (!cutoffTime[meal]) continue;
+
+        const [hours, minutes] = cutoffTime[meal].split(":");
         const cutoff = new Date();
         cutoff.setHours(+hours, +minutes, 0, 0);
 
@@ -99,10 +109,9 @@ export default function UpdateConfirmation() {
           const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
           const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
-          newCountdowns[meal] = `${String(hrs).padStart(2, "0")}:${String(mins).padStart(
-            2,
-            "0"
-          )}:${String(secs).padStart(2, "0")}`;
+          newCountdowns[meal] = `${String(hrs).padStart(2, "0")}:${String(
+            mins
+          ).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
         } else {
           newCountdowns[meal] = "Cutoff Passed";
         }
@@ -137,7 +146,9 @@ export default function UpdateConfirmation() {
       });
 
       if (res.data.success) {
-        toast.success(res.data.message || "Meal preferences updated successfully.");
+        toast.success(
+          res.data.message || "Meal preferences updated successfully."
+        );
       } else {
         toast.error(res.data.message || "Failed to update meal preferences.");
       }
@@ -185,7 +196,8 @@ export default function UpdateConfirmation() {
             </div>
 
             {["breakfast", "lunch", "noshes", "dinner"].map((meal) => {
-              const isBeforeCutoff = countdowns[meal] && countdowns[meal] !== "Cutoff Passed";
+              const isBeforeCutoff =
+                countdowns[meal] && countdowns[meal] !== "Cutoff Passed";
               return (
                 <div
                   key={meal}
@@ -193,7 +205,7 @@ export default function UpdateConfirmation() {
                 >
                   <div className="font-semibold capitalize">{meal}</div>
                   <div className="text-sm text-gray-600 text-center">
-                    Cutoff: {cutoffTime[meal] || "--"}
+                    Cutoff: {cutoffTime[meal] ?? "--"}
                     <br />
                     {countdowns[meal] || ""}
                   </div>
@@ -204,7 +216,11 @@ export default function UpdateConfirmation() {
                       input[meal]
                         ? "bg-green-600 text-white"
                         : "bg-gray-300 text-gray-800"
-                    } ${!isBeforeCutoff || !exists ? "opacity-50 cursor-not-allowed" : ""}`}
+                    } ${
+                      !isBeforeCutoff || !exists
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }`}
                     disabled={!isBeforeCutoff || !exists}
                   >
                     {input[meal] ? "Yes" : "No"}
@@ -218,7 +234,9 @@ export default function UpdateConfirmation() {
               disabled={
                 !exists ||
                 loading ||
-                Object.values(countdowns).every((val) => val === "Cutoff Passed")
+                Object.values(countdowns).every(
+                  (val) => val === "Cutoff Passed"
+                )
               }
               className="w-full mt-6 bg-purple-800 hover:bg-[#5b30a6] rounded-none"
             >
