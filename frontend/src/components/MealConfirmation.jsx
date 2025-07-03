@@ -13,7 +13,7 @@ import useGetConfirmation from "@/hooks/useGetConfirmation";
 export default function MealConfirmation() {
   const { user } = useSelector((store) => store.auth);
   const selectedMess = useSelector(
-    (store) => store.mess.selectedMess[user.userId]
+    (store) => store.mess.selectedMess[user?.userId]
   );
 
   const navigate = useNavigate();
@@ -50,10 +50,12 @@ export default function MealConfirmation() {
       if (!selectedMess?.messId) return;
 
       try {
+        console.log("Fetching cutoff for:", selectedMess.messId);
         const res = await axios.get(
           `${SETTINGS_API_END_POINT}/cutoff/${selectedMess.messId}`,
           { withCredentials: true }
         );
+        console.log("Cutoff time data:", res.data);
         setCutoffTime(res.data?.cutoffTime || {});
       } catch (error) {
         console.error("Error fetching cutoff times", error);
@@ -185,18 +187,17 @@ export default function MealConfirmation() {
                 />
               </div>
 
-              {/* 🍽 Meal Instruction */}
               <div className="mb-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-gray-800 rounded-md">
                 <p className="text-sm">
                   <strong>Note:</strong> Selecting{" "}
                   <span className="font-semibold text-green-700">Yes</span>{" "}
-                  means you will <span className="underline">skip</span> that
-                  particular meal. If you plan to eat, leave it as{" "}
-                  <span className="font-semibold text-gray-700">No</span>.
+                  means you will <u>skip</u> that meal. Leave it{" "}
+                  <span className="font-semibold text-gray-700">No</span> if
+                  you'll eat.
                 </p>
               </div>
 
-              {["breakfast", "lunch", "noshes", "dinner"].map((meal) => {
+              {Object.keys(input).map((meal) => {
                 const isBeforeCutoff =
                   countdowns[meal] && countdowns[meal] !== "Cutoff Passed";
                 return (
