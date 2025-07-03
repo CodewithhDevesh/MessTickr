@@ -20,7 +20,7 @@ export default function Login() {
   const dispatch = useDispatch();
 
   const changeEventHandler = (e) => {
-    setInput({ ...input, [e.target.name]: e.target.value });
+    setInput({ ...input, [e.target.name]: e.target.value.trim() });
   };
 
   const submitHandler = async (e) => {
@@ -29,16 +29,16 @@ export default function Login() {
     try {
       const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
         headers: { "Content-Type": "application/json" },
-        withCredentials: true,
+        withCredentials: true, // Ensures cookie is saved!
       });
 
       if (res.data.success) {
         dispatch(setUser(res.data.user));
-        navigate("/");
         toast.success(res.data.message);
+        navigate("/"); // Redirect after login
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something went wrong");
+      toast.error(error.response?.data?.message || "Login failed");
     } finally {
       dispatch(setLoading(false));
     }
@@ -63,19 +63,20 @@ export default function Login() {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-1/3 bg-white/40 backdrop-blur-md p-6 rounded-lg mt-16 shadow-md"
           >
-            <div className="text-center">
-              <h1 className="font-bold text-2xl mb-6 text-gray-800">Member Sign-In</h1>
-            </div>
+            <h1 className="font-bold text-2xl mb-6 text-center text-gray-800">
+              Member Sign-In
+            </h1>
 
             <div className="mb-4">
               <Label className="font-bold text-md text-black">Email</Label>
               <Input
                 type="email"
-                value={input.email}
                 name="email"
+                value={input.email}
                 onChange={changeEventHandler}
                 placeholder="D@N.com"
                 className="mt-1 placeholder:text-black"
+                required
               />
             </div>
 
@@ -88,26 +89,34 @@ export default function Login() {
                 onChange={changeEventHandler}
                 placeholder="Enter Password"
                 className="mt-1 placeholder:text-black"
+                required
               />
             </div>
 
             <div className="my-4">
               <RadioGroup className="flex items-center gap-6">
                 {["student", "admin"].map((role) => (
-                  <label key={role} className="flex items-center gap-2 cursor-pointer">
+                  <label
+                    key={role}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
                     <input
                       type="radio"
                       name="role"
                       value={role}
                       checked={input.role === role}
-                      onChange={() => setInput({ ...input, role })}
+                      onChange={changeEventHandler}
                       className="hidden peer"
                     />
-                    <div className="w-5 h-5 border-2 border-black rounded-full flex items-center justify-center 
-                      peer-checked:border-purple-800 peer-checked:ring-2 peer-checked:ring-purple-800 transition-all">
-                      <div className={`w-2.5 h-2.5 bg-purple-800 rounded-full transition-all ${
-                        input.role === role ? "opacity-100" : "opacity-0"
-                      }`}></div>
+                    <div
+                      className="w-5 h-5 border-2 border-black rounded-full flex items-center justify-center 
+                      peer-checked:border-purple-800 peer-checked:ring-2 peer-checked:ring-purple-800 transition-all"
+                    >
+                      <div
+                        className={`w-2.5 h-2.5 bg-purple-800 rounded-full transition-all ${
+                          input.role === role ? "opacity-100" : "opacity-0"
+                        }`}
+                      ></div>
                     </div>
                     <span className="font-medium capitalize">{role}</span>
                   </label>
@@ -131,12 +140,18 @@ export default function Login() {
 
             <div className="flex flex-col sm:flex-row justify-between text-sm mt-2 text-black">
               <span>
-                Don't have an account?{" "}
-                <Link to="/signup" className="text-purple-800 font-bold hover:underline">
+                Don’t have an account?{" "}
+                <Link
+                  to="/signup"
+                  className="text-purple-800 font-bold hover:underline"
+                >
                   Signup
                 </Link>
               </span>
-              <Link to="/forgot" className="text-purple-800 font-bold hover:underline mt-1 sm:mt-0">
+              <Link
+                to="/forgot"
+                className="text-purple-800 font-bold hover:underline mt-1 sm:mt-0"
+              >
                 Forgot Password
               </Link>
             </div>
