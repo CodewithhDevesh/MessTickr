@@ -3,6 +3,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
+import serverless from "serverless-http"; 
 import connectDB from "./utils/db.js";
 
 // Importing route handlers
@@ -16,10 +17,10 @@ import messRoute from "./routes/mess.route.js";
 // Load environment variables from .env file
 dotenv.config();
 
-// Initialize an Express application
+// Initialize Express app
 const app = express();
 
-//  CORS configuration: support both localhost & Vercel frontend
+// CORS configuration
 const allowedOrigins = [
   "http://localhost:5173",
   "https://mess-tickr.vercel.app",
@@ -36,19 +37,14 @@ const corsOptions = {
   credentials: true,
 };
 
-//  Use CORS first before other middleware
 app.use(cors(corsOptions));
-
-// Middleware: Parse JSON and form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Middleware: Parse cookies
 app.use(cookieParser());
 
-//  Root test route
+// Root route
 app.get("/", (req, res) => {
-  res.send(" Backend running with CORS and cookies configured");
+  res.send("Backend running with CORS and cookies configured");
 });
 
 // API routes
@@ -59,17 +55,23 @@ app.use("/api/v1/announcement", announcementRoute);
 app.use("/api/v1/feedback", feedbackRoute);
 app.use("/api/v1/mess", messRoute);
 
-// Set the port number for the server
-const PORT = process.env.PORT || 3000;
-
-// Connect to the database and start the server
-connectDB()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running at port ${PORT}`);
+// Only connect and start server locally (not in Vercel)
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 3000;
+  connectDB()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+      });
+    })
+    .catch((error) => {
+      console.error("❌ DB connection failed:", error);
+      process.exit(1);
     });
-  })
-  .catch((error) => {
-    console.error("❌ Database connection failed:", error);
-    process.exit(1);
-  });
+} else {
+  // For Vercel: ensure DB is connected before handling
+  await connectDB();
+}
+
+// Export handler for Vercel
+export const handler = serverless(app);
