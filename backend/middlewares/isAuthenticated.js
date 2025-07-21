@@ -13,19 +13,18 @@ const isAuthenticated = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
-    if (!decoded) {
+    req.id = decoded.userId;
+    req.messId = decoded.messId;
+    next();
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
       return res.status(401).json({
-        message: "Invalid token",
+        message: "Session expired. Please log in again.",
         success: false,
       });
     }
 
-    req.id = decoded.userId;
-    req.messId = decoded.messId; // ✅ Add messId to req object
-
-    next();
-  } catch (error) {
-    console.log(error);
+    console.error("Auth error:", error);
     return res.status(500).json({
       message: "Server error",
       success: false,
