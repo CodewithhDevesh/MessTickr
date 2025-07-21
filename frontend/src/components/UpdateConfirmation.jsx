@@ -14,6 +14,9 @@ export default function UpdateConfirmation() {
   const selectedMess = useSelector(
     (store) => store.mess.selectedMess[user?.userId]
   );
+
+  // console.log(selectedMess);
+
   const navigate = useNavigate();
 
   const [input, setInput] = useState({
@@ -23,7 +26,12 @@ export default function UpdateConfirmation() {
     dinner: false,
   });
 
-  const [cutoffTime, setCutoffTime] = useState({});
+  const [cutoffTime, setCutoffTime] = useState({
+    breakfast: "07:30",
+    lunch: "11:00",
+    noshes: "15:30",
+    dinner: "18:30",
+  });
   const [countdowns, setCountdowns] = useState({});
   const [loading, setLoading] = useState(false);
   const [exists, setExists] = useState(false);
@@ -70,21 +78,15 @@ export default function UpdateConfirmation() {
   useEffect(() => {
     const fetchCutoff = async () => {
       if (!selectedMess?.messId) return;
+
       try {
         const res = await axios.get(
           `${SETTINGS_API_END_POINT}/cutoff/${selectedMess.messId}`,
           { withCredentials: true }
         );
-
-        if (res.data?.cutoffTime) {
-          console.log("⏱️ Cutoff Time:", res.data.cutoffTime); // debug
-          setCutoffTime(res.data.cutoffTime);
-        } else {
-          toast.error("Cutoff times not configured.");
-        }
+        setCutoffTime(res.data?.cutoffTime || {});
       } catch (error) {
-        console.error("Error fetching cutoff times:", error);
-        toast.error("Failed to fetch cutoff times.");
+        console.error("Error fetching cutoff times", error);
       }
     };
 
@@ -95,9 +97,7 @@ export default function UpdateConfirmation() {
     const interval = setInterval(() => {
       const newCountdowns = {};
       for (const meal in cutoffTime) {
-        if (!cutoffTime[meal]) continue;
-
-        const [hours, minutes] = cutoffTime[meal].split(":");
+        const [hours, minutes] = cutoffTime[meal]?.split(":") || [];
         const cutoff = new Date();
         cutoff.setHours(+hours, +minutes, 0, 0);
 
@@ -122,6 +122,7 @@ export default function UpdateConfirmation() {
 
     return () => clearInterval(interval);
   }, [cutoffTime]);
+  // console.log("printing the obj ->", cutoffTime);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -205,7 +206,7 @@ export default function UpdateConfirmation() {
                 >
                   <div className="font-semibold capitalize">{meal}</div>
                   <div className="text-sm text-gray-600 text-center">
-                    Cutoff: {cutoffTime[meal] ?? "--"}
+                    Cutoff: {cutoffTime[meal] || "--"}
                     <br />
                     {countdowns[meal] || ""}
                   </div>
