@@ -53,7 +53,11 @@ export default function EnrollMess() {
 
   return (
     <div
-      style={{ backgroundImage: "url(/MessI1.png)", backgroundSize: "cover", backgroundPosition: "center" }}
+      style={{
+        backgroundImage: "url(/MessI1.png)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
       className="min-h-screen"
     >
       <div className="bg-black/40 min-h-screen">
@@ -66,7 +70,9 @@ export default function EnrollMess() {
             onSubmit={submitHandler}
             className="w-full md:w-2/3 lg:w-1/2 bg-white/60 backdrop-blur-md p-6 sm:p-8 md:p-10 my-10 rounded-xl shadow-2xl"
           >
-            <h1 className="text-2xl font-bold text-center mb-6">Enroll Your Mess</h1>
+            <h1 className="text-2xl font-bold text-center mb-6">
+              Enroll Your Mess
+            </h1>
 
             <div className="mb-4 flex flex-col gap-2">
               <Label className="font-semibold">Mess Name</Label>
@@ -127,12 +133,18 @@ export default function EnrollMess() {
               </Button>
             )}
 
-            <div className="text-left mt-4">
+            <div className="w-full flex justify-between items-center mt-4">
               <span
                 className="text-sm text-purple-700 hover:text-purple-900 cursor-pointer transition"
-                onClick={() => navigate("/")}
+                onClick={() => navigate(-1)}
               >
                 ← Back
+              </span>
+              <span
+                className="text-sm text-purple-700 hover:text-purple cursor-pointer transition"
+                onClick={() => navigate("/getMess")}
+              >
+                View Messes
               </span>
             </div>
           </motion.form>
