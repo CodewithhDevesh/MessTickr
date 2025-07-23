@@ -16,6 +16,11 @@ const messSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 messSchema.index({ name: 1, location: 1 }, { unique: true });
 export const Mess = mongoose.model("Mess", messSchema);
