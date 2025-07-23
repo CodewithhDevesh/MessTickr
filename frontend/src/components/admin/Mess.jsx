@@ -78,7 +78,7 @@ export default function Mess() {
             <div className="text-left mt-4">
               <span
                 className="text-sm cursor-pointer text-purple-700 hover:text-purple-900 transition"
-                onClick={() => navigate("/")}
+                onClick={() => navigate(-1)}
               >
                 ← Back
               </span>
