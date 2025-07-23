@@ -81,7 +81,8 @@ export default function Confirmations() {
             Student Meal Preferences
           </h1>
           <p className="text-center text-sm italic text-gray-700 mb-8">
-            * "Yes" means the student skipped that meal; "No" means they did not skip.
+            * "Yes" means the student skipped that meal; "No" means they did not
+            skip.
           </p>
 
           {/* Filters */}
@@ -165,7 +166,7 @@ export default function Confirmations() {
                     {mess.name} — {mess.location}
                   </h2>
 
-                  {(!meals || meals.length === 0) ? (
+                  {!meals || meals.length === 0 ? (
                     <p className="text-purple-600 italic">
                       No meal preferences submitted for {formattedDate}.
                     </p>
@@ -209,18 +210,29 @@ export default function Confirmations() {
                             <table className="w-full table-auto text-sm">
                               <thead className="bg-purple-100 text-purple-900">
                                 <tr>
-                                  <th className="px-3 py-2 border">Student Name</th>
-                                  <th className="px-3 py-2 border text-center">Breakfast</th>
-                                  <th className="px-3 py-2 border text-center">Lunch</th>
-                                  <th className="px-3 py-2 border text-center">Noshes</th>
-                                  <th className="px-3 py-2 border text-center">Dinner</th>
+                                  <th className="px-3 py-2 border">
+                                    Student Name
+                                  </th>
+                                  <th className="px-3 py-2 border text-center">
+                                    Breakfast
+                                  </th>
+                                  <th className="px-3 py-2 border text-center">
+                                    Lunch
+                                  </th>
+                                  <th className="px-3 py-2 border text-center">
+                                    Noshes
+                                  </th>
+                                  <th className="px-3 py-2 border text-center">
+                                    Dinner
+                                  </th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {students.map((student) => {
                                   const meal = meals.find(
                                     (m) =>
-                                      m.userId?._id === student._id.toString() ||
+                                      m.userId?._id ===
+                                        student._id.toString() ||
                                       m.userId === student._id.toString()
                                   );
                                   return (
@@ -228,11 +240,21 @@ export default function Confirmations() {
                                       key={student._id}
                                       className="hover:bg-purple-50 transition"
                                     >
-                                      <td className="px-3 py-2 border">{student.fullname}</td>
-                                      <td className="px-3 py-2 border text-center">{meal?.breakfast ? "Yes" : "No"}</td>
-                                      <td className="px-3 py-2 border text-center">{meal?.lunch ? "Yes" : "No"}</td>
-                                      <td className="px-3 py-2 border text-center">{meal?.noshes ? "Yes" : "No"}</td>
-                                      <td className="px-3 py-2 border text-center">{meal?.dinner ? "Yes" : "No"}</td>
+                                      <td className="px-3 py-2 border">
+                                        {student.fullname}
+                                      </td>
+                                      <td className="px-3 py-2 border text-center">
+                                        {meal?.breakfast ? "Yes" : "No"}
+                                      </td>
+                                      <td className="px-3 py-2 border text-center">
+                                        {meal?.lunch ? "Yes" : "No"}
+                                      </td>
+                                      <td className="px-3 py-2 border text-center">
+                                        {meal?.noshes ? "Yes" : "No"}
+                                      </td>
+                                      <td className="px-3 py-2 border text-center">
+                                        {meal?.dinner ? "Yes" : "No"}
+                                      </td>
                                     </tr>
                                   );
                                 })}
@@ -249,8 +271,11 @@ export default function Confirmations() {
           </div>
 
           <div className="text-center mt-10">
-            <Button onClick={() => navigate("/")} className="bg-purple-600 hover:bg-purple-700 text-white">
-              ← Back to Home
+            <Button
+              onClick={() => navigate(-1)}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              ← Back
             </Button>
           </div>
         </main>
