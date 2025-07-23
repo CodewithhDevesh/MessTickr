@@ -6,7 +6,7 @@ import { User } from "../models/user.model.js";
 export const registerMess = async (req, res) => {
   try {
     const { name, location, adminEmail, contactNumber } = req.body;
-
+    const userId = req.id;
     if (!name || !adminEmail || !location) {
       return res.status(400).json({
         message: "Mess name, location, and admin email are required.",
@@ -27,6 +27,7 @@ export const registerMess = async (req, res) => {
       location,
       adminEmail,
       contactNumber,
+      createdBy: userId,
     });
 
     return res.status(201).json({
@@ -232,6 +233,45 @@ export const getSelectedMess = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Server error while fetching selected mess.",
+    });
+  }
+};
+
+export const deleteMessById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const adminId = req.id;
+    
+    const user = await User.findById(adminId);
+        if (!user || user.role !== "admin") {
+          return res.status(403).json({
+            message: "Unauthorized. Only admins can delete mess.",
+            success: false,
+          });
+        }
+
+    const deleted = await Mess.findById(id);
+    
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Mess not found" });
+    }
+    
+    if (deleted.createdBy.toString() !== adminId) {
+      return res.status(403).json({
+        message: "You can only delete your own registered messes.",
+        success: false,
+      });
+    }
+    await deleted.deleteOne();
+    res.status(200).json({
+      success: true,
+      message: "Mess deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting mess:", error);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
     });
   }
 };
