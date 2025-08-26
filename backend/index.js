@@ -30,7 +30,7 @@ app.use(cookieParser());
 
 //  CORS configuration to allow requests from the specified origin
 const corsOptions = {
-    origin: "http://localhost:5173", // Allow requests from this origin (replace with your frontend URL)
+    origin: process.env.FRONTEND_URL || "http://localhost:5173", 
     credentials: true, // Allow sending cookies with CORS requests
 };
 
@@ -59,3 +59,4 @@ connectDB()
         console.error("❌ Database connection failed:", error);
         process.exit(1); // Exit process with failure
     });
+
