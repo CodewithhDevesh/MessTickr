@@ -92,8 +92,16 @@ export const login = async (req, res) => {
       mess: user.mess || null, // Include selected mess, if exists
     };
 
-   return res.status(200)
-            .cookie("token", token, { maxAge: 86400000,domain: ".vercel.app", httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",path: "/", })
+  const cookieOptions = {
+            maxAge: 86400000, // 1 day in milliseconds
+            httpOnly: true,
+            secure: true, 
+            sameSite: 'None', 
+            path: "/",
+        };
+
+        return res.status(200)
+            .cookie("token", token, cookieOptions)
             .json({
                 message: `Welcome back ${user.fullname}`,
                 user,
@@ -231,5 +239,6 @@ export const resetPassword = async (req, res) => {
     return res.status(500).json({ message: "Server error. Try again later." });
   }
 };
+
 
 
